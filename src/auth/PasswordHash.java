@@ -6,23 +6,17 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 
 /*
- * Klasa za kreiranje i cuvanje korisnickih sifrica
+ * Pasword hash klasa
  */
 public class PasswordHash {
     private final String salt;
     private final String hash;
-    
-    /*
-     * konstruktor za dodavanje sifre iz parsiranog fajla
-     */
+
     public PasswordHash(String salt, String hash) {
         this.hash = hash;
         this.salt = salt;
     }
-    
-    /*
-     * konstruktor za hesovanje sifre
-     */
+
     public PasswordHash(String password) {
         Random saltGenerator = new Random();
         this.salt = Long.toString(Math.abs(saltGenerator.nextLong()));

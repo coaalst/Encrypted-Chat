@@ -10,9 +10,6 @@ import auth.Authenticator;
 import sec.RSA;
 import server.ClientConnection;
 
-/*
- * Glavna klasa servera za instanciranje tredova
- */
 public class WebServer{
 
 	//port setup

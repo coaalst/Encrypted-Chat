@@ -37,7 +37,7 @@ public class RSA {
         this.e = d.modInverse(lambda);
     }
     
-    //za dekripciju prosledimo argumente koje inicijalno generisemo
+    //za dekripciju prosledimo argumente za desifrovanje
     public RSA(BigInteger e, BigInteger n) {
         this.e = e;
         this.n = n;
@@ -60,6 +60,7 @@ public class RSA {
             candidate = candidate.add(BigInteger.ONE);
         }
     }
+
     /*
      * Funkcija za nalazenje least common multiple (LCM)
      */
@@ -67,32 +68,35 @@ public class RSA {
         return input1.multiply(input2).divide(input1.gcd(input2));
     }
 
+    /*
+     * Funkcija za desifrovanje poruka preko integera u bajtove
+     */
     private BigInteger decrypt(BigInteger encryptedMessage) {
         return encryptedMessage.modPow(d, n);
     }
 
+    /*
+     * Funkcija za desifrovanje poruka preko bajtova u string
+     */
+    public String decryptString(String encryptedMessage) {
+        return new String(decrypt(new BigInteger(encryptedMessage)).toByteArray());
+    }
+
+    /*
+     * Funkcija za enkripciju
+     */
     private BigInteger encrypt(BigInteger message) {
         return message.modPow(e, n);
     }
-    
+
     /*
-     * Funkcija za enkriptovanje string poruke
-     * @param message - string za slanje
+     * Funkcija za enkripciju preko bajtova stringa
      */
     public String encryptString(String message) {
         byte[] data = message.getBytes();
         return encrypt(new BigInteger(data)).toString();
     }
-    
-    /*
-     * Funckija za dekripciju poruka
-     * @param encryptedMessage - sifrovana poruka
-     */
-    public String decryptString(String encryptedMessage) {
-        return new String(decrypt(new BigInteger(encryptedMessage)).toByteArray());
-    }
-    
-    
+
     public BigInteger getN() {
         return n;
     }

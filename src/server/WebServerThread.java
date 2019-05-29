@@ -28,7 +28,6 @@ public class WebServerThread implements Runnable{
 		this.decryptor = decryptor;
 		this.auth = auth;
 	}
-	
 	/*
 	 * Napravimo novu konekciju i prosledimo joj parametre
 	 * Dodamo je u mapu konekcija

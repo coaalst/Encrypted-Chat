@@ -15,11 +15,9 @@ import java.util.regex.Pattern;
 import auth.PasswordHash;
 
 /*
- * Klasa koja sluzi za autentifikaciju korisnickih naloga (doavanje novih, verifikacija login-a...)
+ * Klasa za interakciju sa user profilima
  */
 public class Authenticator {
-	
-	//patern za storovanje podataka (w - word, d - digit, . -anychar sa ili bez \0)
 	private Pattern login = Pattern.compile("(\\w+):(\\d+):(.+)");
 	private Map<String, PasswordHash> users;
 
@@ -27,10 +25,7 @@ public class Authenticator {
 	private BufferedReader fileReader;
 	private PrintWriter fileWriter;
 	
-	/*
-	 * Konstuktor koji prima putanju do fajla kao argument
-	 * @param file - putanja do fajla gde se nalaze credi. korisnika
-	 */
+	//konstruktor
 	public Authenticator(String file) {
 		
 		this.file = file;
@@ -41,7 +36,6 @@ public class Authenticator {
 			while (true) {
 				String line = fileReader.readLine();
 				
-				//fancy parser
 				if (line != null && !line.equals("")) {
 					Matcher lineMatcher = login.matcher(line);
 					lineMatcher.find();
@@ -71,7 +65,7 @@ public class Authenticator {
 	}
 	
 	/*
-	 * Registracija korisnika i upisivanje u fajl
+	 * Registracija korisnika
 	 */
 	public void registerUser(String korisnik, String pass) {
 		
@@ -83,7 +77,7 @@ public class Authenticator {
             //hashuj sifru
             PasswordHash passHash = new PasswordHash(pass);
            
-            //zapis po paternu
+            //zapis
             fileWriter.println(korisnik + ":" + passHash.getSalt() + ":" + passHash.getHash());
             fileWriter.flush();
             

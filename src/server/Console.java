@@ -50,8 +50,8 @@ public class Console implements Runnable{
 	}
 	
 	/*
-	 * Funkcija za slanje svima notifikacije
-	 */
+     * Funkcija za slanje golbalnih poruka
+     */
 	private void broadcast(String substring) {
 		// TODO Auto-generated method stub
         for (ClientConnection c : clients.values()) c.sendEncrypeted("SERVER: " + substring);
@@ -59,18 +59,18 @@ public class Console implements Runnable{
 	}
 	
 	/*
-	 * Funkcija za prikaz svih povezanih korisnika
-	 */
+     * Prikaz konektovanih korisnika
+     */
 	private void printListOfClients() {
 		// TODO Auto-generated method stub
-		System.out.println("Konektovano: (" + clients.size() + ") korisnika");
+		System.out.println("Konektovano: (" + clients.size() + ") korisnika:");
 		for (String username : clients.keySet()) System.out.println("\t" + username);
 		
 	}
 	
 	/*
-	 * funkcija za kikovanje
-	 */
+     * Funkcija za kikovanje
+     */
 	private void kick(String substring) {
 		// TODO Auto-generated method stub
 		try {
@@ -80,4 +80,5 @@ public class Console implements Runnable{
 			e.printStackTrace();
 		}
 	}
+
 }

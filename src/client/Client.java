@@ -1,6 +1,10 @@
 package client;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -8,89 +12,53 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Scanner;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import auth.LoginState;
 import sec.RSA;
 
 /*
- * Glavna klient klasa
+ * Klijent klasa
  */
 public class Client {
 
+	//output za slanje
 	private static PrintWriter socket_out;
 
 	//enkripcija za poruke
 	private static RSA decryptor;
 	private static RSA encrypt;
 	
-	private static Scanner input = new Scanner(System.in);
+	//login view
+	private static Login log;
 
 	public static void main(String[] args) {
 
 		try {
-			
-			//ovde dodati ip servera
+
+			//setup soketa
 			Socket client = new Socket("localhost", 8081);
 
-			//saljemo kljuceve
+			//saljemo kljuceve servere
 			socket_out = new PrintWriter(client.getOutputStream());
 			decryptor = new RSA();
 			socket_out.println(decryptor.getE());
 			socket_out.println(decryptor.getN());
 			socket_out.flush();
-			
-			//u modul za dekripciju saljemo dekriptor i client socket
+
+			//setup thread-a za poruke
 			ClientInputModul cim = new ClientInputModul(client, decryptor);
 			BigInteger e = new BigInteger(cim.readInput());
 			BigInteger n = new BigInteger(cim.readInput());
-			
-			//uzimamo kljuceve za enkripciju
 			encrypt = new RSA(e, n);
 
-			input = new Scanner(System.in);
-			
-			//stanje login-a
-			LoginState authState;
+			//init gui
+			log = new Login(client, encrypt, decryptor, cim);
 
-			do {
-				//unos podataka
-				System.out.print("Nickname: ");
-				String username = input.nextLine();
-				System.out.print("Password: ");
-				String password = input.nextLine();
-				
-				//saljemo ih serveru na verifikaciju
-				socket_out.println(encrypt.encryptString(username));
-				socket_out.println(encrypt.encryptString(password));
-				socket_out.flush();
-				
-				//hvatamo odgovor
-				authState = LoginState.valueOf(decryptor.decryptString(cim.readInput()));
-				
-				//print na ekran za trablshoot
-				System.out.println(authState.name());
-				
-			} while (authState != LoginState.LOGIN_ACCPETED && authState != LoginState.REGISTERED);
-			
-			//porekecemo run metode u modulu
-			new Thread(cim).start();
-			
-			while (true) {
-				
-				//input za ostale korisnike
-				String messageToServer = input.nextLine();
-				
-				//ako nije prazna
-				if (!messageToServer.equals("")) {
-					socket_out.println(encrypt.encryptString(messageToServer));
-					socket_out.flush();
-				} 
-				
-				//komanda za promenu sifre
-				else if (messageToServer.toLowerCase().startsWith(":changepassword")) {
-					socket_out.println(encrypt.encryptString("changePassword: " + input.nextLine()));
-				}
-			}
 		}
 		catch (Exception e) {
 			// TODO: handle exception

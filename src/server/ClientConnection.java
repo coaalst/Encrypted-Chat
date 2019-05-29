@@ -27,7 +27,7 @@ import sec.RSA;
 
 public class ClientConnection {
 	//paterni
-	private static final Pattern PRIVATE_MESSAGE_NICKNAME_PATTERN = Pattern.compile("@(\\w+) (.*)");
+	private static final Pattern PRIVATE_MESSAGE_NICKNAME_PATTERN = Pattern.compile("(\\w+) (.*)");
 	private static final Pattern NICKNAME_RULES = Pattern.compile("\\w+");
 
 	protected final String username;
@@ -82,14 +82,14 @@ public class ClientConnection {
 				//hvatanje poruke i dekripcija
 				String message = decryptor.decryptString(clientData);
 				
-				//setup za priv message
-				Matcher privateMessageMatcher = PRIVATE_MESSAGE_NICKNAME_PATTERN.matcher(message);
+				//komanda za alert korisnika
+				if (message.toLowerCase().startsWith(":@")) sendAlert(message);
 				
 				//komanda za listing svih povezanih korisnika
 				if (message.equals(":clients")) sendClientList();
 				
 				//komanda za private poruke uz pomoc matching-a
-				else if (privateMessageMatcher.matches()) sendPrivateMessage(privateMessageMatcher);
+				//else if (message.toLowerCase().startsWith(":private")) sendPrivateMessage(privateMessageMatcher);
 				
 				//komanda za prikaz poruke celoj sobi
 				else broadcast(username + ": " + message);
@@ -100,6 +100,15 @@ public class ClientConnection {
 		}
 	}
 	
+	/*
+	 * Funckiaj za slanje alerta neakrivnim korisnicima
+	 */
+	private void sendAlert(String message) {
+		String tokens[] = message.split(" ");
+		for (ClientConnection cC : clients.values()) 
+			if (cC.username.equals(tokens[1])) cC.sendEncrypeted("beep:");
+	}
+
 	/*
 	 * Funkcija za slanje enkriptovanih poruka
 	 * @param message - poruka za salnje
@@ -132,9 +141,12 @@ public class ClientConnection {
 	 * Funkcija za listovanje korisnika u sobi
 	 */
 	private void sendClientList() {
+		String message = "SERVER: \n";
 		for (String nickname : clients.keySet()) {
-			sendEncrypeted("\t" + nickname);
+			message = message + "\t" + nickname + "\n";
 		}
+		message += "\n";
+		sendEncrypeted(message);
 	}
 	
 	/*
